@@ -19,10 +19,13 @@
     <code>conan install . --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True -s compiler.cppstd=gnu20</code> <br>
     maybe you will need these flags for the conan <code>-s build_type=Debug</code>
 
-5. Build <br>
+5. Init submodules <br>
+    <code>git submodule update --init --recursive</code>
+
+6. Build <br>
     <code>cmake . -B build -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake; cmake --build build</code>
 
-6. Run <br>
+7. Run <br>
     <code>./build/src/matrix_chain</code>
 
 ## How to test

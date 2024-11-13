@@ -12,5 +12,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -g -O0 -fsanitize=address -fsanitize=undefined"
 
 enable_testing()
 
+add_subdirectory(./Matrix)
 add_subdirectory(./src)
 add_subdirectory(./tests)

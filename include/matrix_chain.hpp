@@ -4,12 +4,15 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <numeric>
 
 namespace matrix_chain {
 
     class dp_chain_t {
+    protected:
         std::vector<int> sizes_;
         std::vector<int> order_;
+        int cost_;
     
     private:
         int get_max_scope(const std::vector<std::vector<std::pair<int, int>>>& path) const {
@@ -142,7 +145,13 @@ namespace matrix_chain {
                 }
             }
 
-            order_ = get_optimal_path(path);
+            cost_ = dp[dp_size - 1][dp_size - 1].cost;
+            if (cost_ == 0) {
+                order_.resize(sizes_.size() - 2);
+                std::iota(order_.begin(), order_.end(), 0);
+            } else {
+                order_ = get_optimal_path(path);
+            }
         }
 
     public:
