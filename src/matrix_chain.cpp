@@ -18,6 +18,6 @@ int main() {
     
     matrix_chain::matrix_chain_t chain{sizes.begin(), sizes.end()};
 
-    chain.print_procedure(std::cout);
+    chain.print_order(std::cout);
     return 0;
 }

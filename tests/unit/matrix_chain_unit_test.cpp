@@ -18,6 +18,6 @@ TEST(Matrix_chain_main, test_simple)
     chain.add_matrix(5);
     chain.add_matrix(10);
 
-    ans = chain.get_procedure();
-    is_vectors_eq(ans, {30, 35, 15, 5, 10});
+    ans = chain.get_order();
+    is_vectors_eq(ans, {1, 0, 2});
 }
