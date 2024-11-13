@@ -20,7 +20,9 @@ namespace matrix_chain {
             return max + 1;
         }
 
-        std::vector<int> get_optimal_path(const std::vector<std::vector<std::pair<int, int>>>& path) const {
+        std::vector<int> get_optimal_path(
+            const std::vector<std::vector<std::pair<int, int>>>& path) const {
+
             std::vector<std::vector<int>> scopes(get_max_scope(path));
             int i, j;
             i = j = path.size() - 1;
@@ -59,7 +61,9 @@ namespace matrix_chain {
         void print_dp(const std::vector<std::vector<dp_elem_t>>& dp) {
             for (int i = 0, end = dp.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" << dp[i][j].cost << ",\t" << dp[i][j].x << ",\t" << dp[i][j].y << "]\t";
+                    std::cout << "[" << dp[i][j].cost << ",\t"
+                                     << dp[i][j].x    << ",\t"
+                                     << dp[i][j].y    << "]\t";
                 std::cout << "\n";
             }
         }
@@ -67,7 +71,8 @@ namespace matrix_chain {
         void print_path(const std::vector<std::vector<std::pair<int, int>>>& path) {
             for (int i = 0, end = path.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" << path[i][j].first << ",\t" << path[i][j].second << "]\t";
+                    std::cout << "[" << path[i][j].first  << ",\t"
+                                     << path[i][j].second << "]\t";
                 std::cout << "\n";
             }
         }
@@ -93,6 +98,7 @@ namespace matrix_chain {
                     int next_row = i + 1;
                     int prev_col = j - 1;
 
+                    // new matrix to scope
                     for (int row = i; row >= 0; --row) {
                         if (dp[i][prev_col].y != dp[row][j].x)
                             continue;
@@ -109,6 +115,7 @@ namespace matrix_chain {
                         }
                     }
 
+                    // new scope to scope
                     for (int col = j; col >= 0; --col) {
                         if (dp[i][col].y != dp[i][j].x)
                             continue;
@@ -144,7 +151,7 @@ namespace matrix_chain {
             update_order();
         }
 
-        void add_elem(int size) {
+        void push(int size) {
             sizes_.push_back(size);
             update_order();
         }
@@ -164,13 +171,10 @@ namespace matrix_chain {
     public:
         using dp_chain_t::print_order;
         using dp_chain_t::get_order;
+        using dp_chain_t::push;
 
         template <typename It>
         matrix_chain_t(It start, It end) : dp_chain_t(start, end) {}
-
-        void add_matrix(int x) {
-            add_elem(x);
-        }
 
         std::ostream& print(std::ostream& os) const {
             os << print_lblue("Matrix Chain\n");

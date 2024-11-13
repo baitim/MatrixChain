@@ -15,8 +15,8 @@ TEST(Matrix_chain_main, test_simple)
 
     matrix_chain::matrix_chain_t chain{sizes.begin(), sizes.end()};
 
-    chain.add_matrix(5);
-    chain.add_matrix(10);
+    chain.push(5);
+    chain.push(10);
 
     ans = chain.get_order();
     is_vectors_eq(ans, {1, 0, 2});
