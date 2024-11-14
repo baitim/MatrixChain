@@ -11,7 +11,7 @@ int main() {
     }
 
     unsigned chain_size = n;
-    std::vector<int> sizes(chain_size);
+    std::vector<unsigned> sizes(chain_size);
 
     for (int i = 0; i < n; ++i)
         std::cin >> sizes[i];
