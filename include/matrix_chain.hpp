@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-#include <numeric>
+#include <set>
 
 namespace matrix_chain {
 
@@ -15,127 +15,112 @@ namespace matrix_chain {
         unsigned cost_;
     
     private:
-        unsigned get_max_scope(const std::vector<std::vector<std::pair<unsigned, unsigned>>>& path) const {
-            unsigned max = 0;
-            for (int i = 0, end = path.size(); i < end; ++i)
-                for (int j = i; j < end; ++j)
-                    max = std::max(max, path[i][j].second);
-            return max + 1;
-        }
-
+        struct dp_path_t final {
+            unsigned x = 0;
+            unsigned y = 0;
+            dp_path_t() {}
+            dp_path_t(unsigned x_, unsigned y_) : x(x_), y(y_) {}
+            bool operator<(const dp_path_t& other) const { return y < other.y; }
+        };
+        using path_container_t = std::vector<std::vector<std::pair<dp_path_t, dp_path_t>>>;
+        
         std::vector<unsigned> get_optimal_path(
-            const std::vector<std::vector<std::pair<unsigned, unsigned>>>& path) const {
-
-            std::vector<std::vector<unsigned>> scopes(get_max_scope(path));
-            unsigned i, j;
-            i = j = path.size() - 1;
-            while (i > 0) {
-                scopes[path[i][j].second].push_back(i - 1);
-                if (path[i][j].first == 1 + path[i - 1][j - 1].first) {
-                    i--;
-                    j--;
-                } else if (i > 0 && path[i][j].first == 1 + path[i - 1][j].first) {
-                    i--;
-                } else {
-                    break;
-                }
-            }
+            const path_container_t& path) const {
 
             std::vector<unsigned> ans;
-            for (int i = scopes.size() - 1; i >= 0; --i) {
-                auto& scope = scopes[i];
-                sort(scope.begin(), scope.end());
-                for (int size : scope)
-                    ans.push_back(size);
+            std::set<dp_path_t> opers;
+            std::set<unsigned> used_opers;
+            unsigned i, j;
+            i = j = path.size() - 1;
+
+            opers.insert(path[i][j].first);
+            opers.insert(path[i][j].second);
+
+            while (!opers.empty()) {
+                dp_path_t oper = *opers.begin();
+
+                if (i > 0 &&
+                    used_opers.find(oper.y) == used_opers.end()) {
+                    std::cerr << "pushed: " << i << " " << j << "\n";
+                    ans.push_back(oper.y);
+                }
+
+
+                i = oper.x;
+                j = oper.y;
+
+                used_opers.insert(oper.y);
+                opers.erase(oper);
+
+                if (i > 0) {
+                    opers.insert(path[i][j].second);
+                    opers.insert(path[i][j].first);
+                }
             }
+            reverse(ans.begin(), ans.end());
 
             return ans;
         }
 
-        struct dp_elem_t final {
-            long long cost = 0;
-            unsigned x;
-            unsigned y;
-            dp_elem_t() {}
-            dp_elem_t(unsigned x_, unsigned y_) : x(x_), y(y_) {}
-            dp_elem_t(long long cost_, unsigned x_, unsigned y_) : cost(cost_), x(x_), y(y_) {}
-        };
-
-        void print_dp(const std::vector<std::vector<dp_elem_t>>& dp) {
+        void print_dp(const std::vector<std::vector<long long>>& dp) {
             for (int i = 0, end = dp.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" << dp[i][j].cost << ",\t"
-                                     << dp[i][j].x    << ",\t"
-                                     << dp[i][j].y    << "]\t";
+                    std::cout << "[" 
+                              << dp[i][j] << ",\t"
+                              << sizes_[std::max(0, j - i)] << ",\t"
+                              << sizes_[j + 1] << "]\t";
                 std::cout << "\n";
             }
         }
 
-        void print_path(const std::vector<std::vector<std::pair<unsigned, unsigned>>>& path) {
+        void print_path(const path_container_t& path) {
             for (int i = 0, end = path.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" << path[i][j].first  << ",\t"
-                                     << path[i][j].second << "]\t";
+                    std::cout << "[" << path[i][j].first.x << ",\t"
+                                     << path[i][j].first.y << "]\t\t";
+                std::cout << "\n";
+            }
+            std::cout << "---------------------------------------------\n";
+            for (int i = 0, end = path.size(); i < end; ++i) {
+                for (int j = 0; j < end; ++j)
+                    std::cout << "[" << path[i][j].second.x << ",\t"
+                                     << path[i][j].second.y << "]\t\t";
                 std::cout << "\n";
             }
         }
 
         void update_order() {
             const unsigned dp_size = sizes_.size() - 1;
-            std::vector<std::vector<dp_elem_t>> dp;
-            std::vector<std::vector<std::pair<unsigned, unsigned>>> path; // path, scope
-            dp.assign  (dp_size, std::vector<dp_elem_t>(dp_size));
-            path.assign(dp_size, std::vector<std::pair<unsigned, unsigned>>(dp_size, {0, 1}));
+            std::vector<std::vector<long long>> dp;
+            path_container_t path;
+            dp.assign  (dp_size, std::vector<long long>(dp_size, -1));
+            path.assign(dp_size, std::vector<std::pair<dp_path_t, dp_path_t>>(dp_size));
 
             for (unsigned i = 0; i < dp_size; ++i)
-                for (unsigned j = 0; j < dp_size; ++j)
-                    dp[i][j] = {sizes_[j], sizes_[j + 1]};
+                dp[0][i] = 0;
 
-            for (unsigned i = 1; i < dp_size; ++i) {
-                dp[1][i] = {sizes_[i - 1] * sizes_[i] * sizes_[i + 1], sizes_[i - 1], sizes_[i + 1]};
-                path[1][i] = {i, 1};
-            }
-
-            for (unsigned i = 1; i < dp_size; ++i) {
+            for (unsigned i = 0; i < dp_size - 1; ++i) {
                 for (unsigned j = i + 1; j < dp_size; ++j) {
                     unsigned next_row = i + 1;
-                    unsigned prev_col = j - 1;
+                    for (int rrow = i; rrow >= 0; --rrow) {
+                        unsigned rcol = j;
+                        unsigned lrow = i - rrow;
+                        unsigned lcol = j - rrow - 1;
+                        if ((static_cast<int>(j) - rrow - 1) >= 0) {
+                            unsigned x = sizes_[j - i - 1] * sizes_[lcol + 1] * sizes_[rcol + 1];
+                            unsigned new_cost = x + dp[lrow][lcol] + dp[rrow][rcol];
 
-                    // new matrix to scope
-                    for (int row = i; row >= 0; --row) {
-                        if (dp[i][prev_col].y != dp[row][j].x)
-                            continue;
-                        
-                        unsigned x = dp[i][prev_col].x * dp[row][j].x * dp[row][j].y;
-                        unsigned new_cost = x + dp[i][prev_col].cost;
-                        
-                        if (dp[next_row][j].cost == 0 ||
-                            dp[next_row][j].cost > new_cost) {
+                            if (dp[next_row][rcol] == -1 ||
+                                dp[next_row][rcol] > new_cost) {
 
-                            path[next_row][j] = {path[i][prev_col].first + 1, path[row][j].second};
-                            dp[next_row][j].cost = new_cost;
-                            dp[next_row][j].x = dp[i][prev_col].x;
+                                path[next_row][rcol].first  = {static_cast<unsigned>(rrow),  rcol};
+                                path[next_row][rcol].second = {lrow, lcol};
+                                dp[next_row][rcol] = new_cost;
+                            }
                         }
                     }
 
-                    // new scope to scope
-                    for (int col = j; col >= 0; --col) {
-                        if (dp[i][col].y != dp[i][j].x)
-                            continue;
-
-                        unsigned x = dp[i][col].x * dp[i][j].x * dp[i][j].y;
-                        unsigned new_cost = x + dp[i][j].cost;
-                        
-                        if (dp[next_row][j].cost == 0 ||
-                            dp[next_row][j].cost > new_cost) {
-
-                            path[next_row][j] = {path[i][j].first + 1, path[i][j].second + 1};
-                            dp[next_row][j].cost = new_cost;
-                            dp[next_row][j].x = dp[i][j].x;
-                        }
-                    }
-
-#ifdef DEBUG
+#if 1
                     print_dp(dp);
                     std::cout << "\n";
                     print_path(path);
@@ -145,13 +130,8 @@ namespace matrix_chain {
                 }
             }
 
-            cost_ = dp[dp_size - 1][dp_size - 1].cost;
-            if (cost_ == 0) {
-                order_.resize(sizes_.size() - 2);
-                std::iota(order_.begin(), order_.end(), 0);
-            } else {
-                order_ = get_optimal_path(path);
-            }
+            cost_ = dp[dp_size - 1][dp_size - 1];
+            order_ = get_optimal_path(path);
         }
 
     public:
@@ -194,28 +174,43 @@ namespace matrix_chain {
             auto it = start;
             unsigned prev = *it++;
             for (int i = 0; it != end; ++it, ++i) {
-                pseudo_matrices.push_back({prev, *it});
+                pseudo_matrices.push_back({prev, *it, 1});
                 prev = *it;
             }
         }
 
         void add_matrix(unsigned size) {
             push(size);
-            pseudo_matrices.push_back({sizes_.back(), size});
+            pseudo_matrices.push_back({sizes_.back(), size, 1});
         }
 
         matrix::matrix_t<unsigned> multiply_chain_naive() {
-            matrix::matrix_t<unsigned> res = pseudo_matrices[0];
-            for (int i = 1, end = sizes_.size(); i < end; ++i)
-                res = res * pseudo_matrices[i];
-            return res;
+            // matrix::matrix_t<unsigned> res = pseudo_matrices[0];
+           
+            // for (int i = 1, end = pseudo_matrices.size(); i < end; ++i) {
+            //     matrix::matrix_t<unsigned> tmp{std::move(res)};
+            //     res = tmp * pseudo_matrices[i];
+            // }
+            // return res;
+            return pseudo_matrices[0];
         }
 
         matrix::matrix_t<unsigned> multiply_chain_fast() {
-            matrix::matrix_t<unsigned> res = pseudo_matrices[order_[0]];
-            for (int i = 1, end = order_.size(); i < end; ++i)
-                res = res * pseudo_matrices[order_[i]];
-            return res;
+            // matrix::matrix_t<unsigned> res = pseudo_matrices[order_[0]] * pseudo_matrices[order_[0] + 1];
+        
+            // for (int i = 1, end = order_.size(); i < end; ++i) {
+            //     matrix::matrix_t<unsigned> tmp{std::move(res)};
+
+            //     std::cerr << "order: " << order_[i] << "\n";
+            //     std::cerr << "tmp :\n" << tmp << "\n";
+
+            //     if (order_[i] > order_[i - 1]) {//std::cerr << "mul 1 :\n" << pseudo_matrices[order_[i] + 1] << "\n";
+            //         res = tmp * pseudo_matrices[order_[i] + 1]; }
+            //     else{//std::cerr << "mul 2 :\n" << pseudo_matrices[order_[i]] << "\n";
+            //         res = pseudo_matrices[order_[i]] * tmp; }
+            // }
+            // return res;
+            return pseudo_matrices[0];
         }
     };
 
