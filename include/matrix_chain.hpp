@@ -218,8 +218,8 @@ namespace matrix_chain {
                 if (!matrices[order_[i]])
                     return {{0, 0}, 0};
                 
-                matrix::matrix_t<ElemT> left {0, 0};
-                matrix::matrix_t<ElemT> right{0, 0};
+                matrix::matrix_t<ElemT> left  = matrices[order_[i]];
+                matrix::matrix_t<ElemT> right = matrices[order_[i] + 1];;
                 unsigned ind_left  = order_[i];
                 unsigned ind_right = order_[i];
                 for (int j = 0, end = results.size(); j < end; ++j) {
@@ -232,12 +232,6 @@ namespace matrix_chain {
                         ind_left = results[j].left;
                     }
                 }
-
-                if (!left)
-                    left = matrices[order_[i]];
-
-                if (!right)
-                    right = matrices[order_[i] + 1];
 
                 results.push_back({left * right, ind_left, ind_right});
                 cost += left.get_cols() * left.get_rows() * right.get_cols();
