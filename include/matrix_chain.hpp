@@ -13,8 +13,7 @@ namespace matrix_chain {
     protected:
         std::vector<unsigned> sizes_;
         std::vector<unsigned> order_;
-        unsigned cost_;
-    
+
     private:
         struct dp_path_t final {
             unsigned x = 0;
@@ -129,7 +128,6 @@ namespace matrix_chain {
                 }
             }
 
-            cost_ = dp[dp_size - 1][dp_size - 1];
             order_ = get_optimal_path(path);
         }
 
@@ -159,7 +157,16 @@ namespace matrix_chain {
     class matrix_chain_t final : dp_chain_t {
         using dp_chain_t::sizes_;
         using dp_chain_t::order_;
-        std::vector<matrix::matrix_t<unsigned>> pseudo_matrices;
+        std::vector<matrix::matrix_t<unsigned>> matrices;
+
+        struct mult_block_t final {
+            matrix::matrix_t<unsigned> m{0, 0};
+            unsigned left  = -1;
+            unsigned right = -1;
+            mult_block_t() {}
+            mult_block_t(matrix::matrix_t<unsigned> m_, unsigned left_, unsigned right_)
+            : m(m_), left(left_), right(right_) {}
+        };
 
     public:
         using dp_chain_t::print_order;
@@ -172,44 +179,57 @@ namespace matrix_chain {
 
             auto it = start;
             unsigned prev = *it++;
-            for (int i = 0; it != end; ++it, ++i) {
-                pseudo_matrices.push_back({prev, *it, 1});
+            for (; it != end; ++it) {
+                matrices.push_back({prev, *it, 1});
                 prev = *it;
             }
         }
 
         void add_matrix(unsigned size) {
+            matrices.push_back({sizes_.back(), size, 1});
             push(size);
-            pseudo_matrices.push_back({sizes_.back(), size, 1});
         }
 
-        matrix::matrix_t<unsigned> multiply_chain_naive() {
-            // matrix::matrix_t<unsigned> res = pseudo_matrices[0];
-           
-            // for (int i = 1, end = pseudo_matrices.size(); i < end; ++i) {
-            //     matrix::matrix_t<unsigned> tmp{std::move(res)};
-            //     res = tmp * pseudo_matrices[i];
-            // }
-            // return res;
-            return pseudo_matrices[0];
+        std::pair<matrix::matrix_t<unsigned>, unsigned> multiply_chain_naive() const {
+            matrix::matrix_t<unsigned> res = matrices[0];
+            long long cost = 0;
+            for (int i = 1, end = matrices.size(); i < end; ++i) {
+                matrix::matrix_t<unsigned> tmp{std::move(res)};
+                cost += tmp.get_rows() * tmp.get_cols() * matrices[i].get_cols();
+                res = tmp * matrices[i];
+            }
+            return {res, cost};
         }
 
-        matrix::matrix_t<unsigned> multiply_chain_fast() {
-            // matrix::matrix_t<unsigned> res = pseudo_matrices[order_[0]] * pseudo_matrices[order_[0] + 1];
-        
-            // for (int i = 1, end = order_.size(); i < end; ++i) {
-            //     matrix::matrix_t<unsigned> tmp{std::move(res)};
+        std::pair<matrix::matrix_t<unsigned>, unsigned> multiply_chain_fast() const {
+            std::vector<mult_block_t> results;
+            long long cost = 0;
+            for (int i = 0, end = order_.size(); i < end; ++i) {
+                matrix::matrix_t<unsigned> left {0, 0};
+                matrix::matrix_t<unsigned> right{0, 0};
+                unsigned ind_left  = order_[i];
+                unsigned ind_right = order_[i];
+                for (int j = 0, end = results.size(); j < end; ++j) {
+                    if (results[j].left - 1 == order_[i]) {
+                        right = results[j].m;
+                        ind_right = results[j].right;
+                    }
+                    if (results[j].right + 1 == order_[i]) {
+                        left = results[j].m;
+                        ind_left = results[j].left;
+                    }
+                }
 
-            //     std::cerr << "order: " << order_[i] << "\n";
-            //     std::cerr << "tmp :\n" << tmp << "\n";
+                if (!left)
+                    left = matrices[order_[i]];
 
-            //     if (order_[i] > order_[i - 1]) {//std::cerr << "mul 1 :\n" << pseudo_matrices[order_[i] + 1] << "\n";
-            //         res = tmp * pseudo_matrices[order_[i] + 1]; }
-            //     else{//std::cerr << "mul 2 :\n" << pseudo_matrices[order_[i]] << "\n";
-            //         res = pseudo_matrices[order_[i]] * tmp; }
-            // }
-            // return res;
-            return pseudo_matrices[0];
+                if (!right)
+                    right = matrices[order_[i] + 1];
+
+                results.push_back({left * right, ind_left, ind_right});
+                cost += left.get_cols() * left.get_rows() * right.get_cols();
+            }
+            return {results.back().m, cost};
         }
     };
 
