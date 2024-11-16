@@ -45,7 +45,7 @@ TEST(Matrix_chain_main, test_zero)
     std::vector<unsigned> ans;
     std::vector<unsigned> sizes = {30, 20, 10};
 
-    matrix_chain::matrix_chain_t chain{sizes.begin(), sizes.end()};
+    matrix_chain::matrix_chain_t<short> chain{sizes.begin(), sizes.end()};
 
     chain.add_matrix(1);
     chain.add_matrix(20);
@@ -63,7 +63,7 @@ TEST(Matrix_chain_main, test_split_muls)
     std::vector<unsigned> ans;
     std::vector<unsigned> sizes = {5, 15, 7, 17, 5};
 
-    matrix_chain::matrix_chain_t chain{sizes.begin(), sizes.end()};
+    matrix_chain::matrix_chain_t<unsigned> chain{sizes.begin(), sizes.end()};
 
     ans = chain.get_order();
     is_vectors_eq(ans, {0, 2, 1}, "test split muls");

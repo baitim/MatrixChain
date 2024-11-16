@@ -154,17 +154,18 @@ namespace matrix_chain {
         virtual ~dp_chain_t() {};
     };
 
+    template <matrix::matrix_elem ElemT = unsigned long long>
     class matrix_chain_t final : dp_chain_t {
         using dp_chain_t::sizes_;
         using dp_chain_t::order_;
-        std::vector<matrix::matrix_t<unsigned>> matrices;
+        std::vector<matrix::matrix_t<ElemT>> matrices;
 
         struct mult_block_t final {
-            matrix::matrix_t<unsigned> m{0, 0};
+            matrix::matrix_t<ElemT> m{0, 0};
             unsigned left  = -1;
             unsigned right = -1;
             mult_block_t() {}
-            mult_block_t(matrix::matrix_t<unsigned> m_, unsigned left_, unsigned right_)
+            mult_block_t(matrix::matrix_t<ElemT> m_, unsigned left_, unsigned right_)
             : m(m_), left(left_), right(right_) {}
         };
 
@@ -190,23 +191,23 @@ namespace matrix_chain {
             push(size);
         }
 
-        std::pair<matrix::matrix_t<unsigned>, unsigned> multiply_chain_naive() const {
-            matrix::matrix_t<unsigned> res = matrices[0];
+        std::pair<matrix::matrix_t<ElemT>, long long> multiply_chain_naive() const {
+            matrix::matrix_t<ElemT> res = matrices[0];
             long long cost = 0;
             for (int i = 1, end = matrices.size(); i < end; ++i) {
-                matrix::matrix_t<unsigned> tmp{std::move(res)};
+                matrix::matrix_t<ElemT> tmp{std::move(res)};
                 cost += tmp.get_rows() * tmp.get_cols() * matrices[i].get_cols();
                 res = tmp * matrices[i];
             }
             return {res, cost};
         }
 
-        std::pair<matrix::matrix_t<unsigned>, unsigned> multiply_chain_fast() const {
+        std::pair<matrix::matrix_t<ElemT>, long long> multiply_chain_fast() const {
             std::vector<mult_block_t> results;
             long long cost = 0;
             for (int i = 0, end = order_.size(); i < end; ++i) {
-                matrix::matrix_t<unsigned> left {0, 0};
-                matrix::matrix_t<unsigned> right{0, 0};
+                matrix::matrix_t<ElemT> left {0, 0};
+                matrix::matrix_t<ElemT> right{0, 0};
                 unsigned ind_left  = order_[i];
                 unsigned ind_right = order_[i];
                 for (int j = 0, end = results.size(); j < end; ++j) {
@@ -233,7 +234,8 @@ namespace matrix_chain {
         }
     };
 
-    std::ostream& operator<<(std::ostream& os, const matrix_chain_t& chain) {
+    template <matrix::matrix_elem ElemT>
+    std::ostream& operator<<(std::ostream& os, const matrix_chain_t<ElemT>& chain) {
         return chain.print_order(os);
     }
 };
