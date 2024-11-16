@@ -42,7 +42,7 @@
 
 * Comparing
     write <code>python3 compare.py</code> in terminal <br>
-    The result of the comparison will be in the "compare.out" and "costs.png" file
+    The result of the comparison will be in the "compare.out" and "ratios.png" file
 
 <p align="center"><img src="https://github.com/baitim/MatrixChain/blob/main/compare/ratios.png" width="80%"></p>
 
