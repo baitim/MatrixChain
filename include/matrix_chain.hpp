@@ -9,6 +9,15 @@
 
 namespace matrix_chain {
 
+    class error_t final : std::exception {
+        std::string msg_;
+    
+    public:
+        error_t(const char*        msg) : msg_(msg) {}
+        error_t(const std::string& msg) : msg_(msg) {}
+        const char* what() const noexcept { return msg_.c_str(); }
+    };
+
     class dp_chain_t {
     protected:
         std::vector<unsigned> sizes_;
@@ -176,7 +185,7 @@ namespace matrix_chain {
         template <typename It>
         matrix_chain_t(It start, It end) : dp_chain_t(start, end) {
             if (sizes_.size() < 2)
-                throw;
+                throw error_t{"size of chain less than 2"};
 
             auto it = start;
             unsigned prev = *it++;
@@ -191,7 +200,7 @@ namespace matrix_chain {
             push(size);
         }
 
-        std::pair<matrix::matrix_t<ElemT>, long long> multiply_chain_naive() const {
+        matrix::matrix_t<ElemT> multiply_chain_naive() const {
             matrix::matrix_t<ElemT> res = matrices[0];
             long long cost = 0;
             for (int i = 1, end = matrices.size(); i < end; ++i) {
@@ -199,13 +208,16 @@ namespace matrix_chain {
                 cost += tmp.get_rows() * tmp.get_cols() * matrices[i].get_cols();
                 res = tmp * matrices[i];
             }
-            return {res, cost};
+            return res;
         }
 
         std::pair<matrix::matrix_t<ElemT>, long long> multiply_chain_fast() const {
             std::vector<mult_block_t> results;
             long long cost = 0;
             for (int i = 0, end = order_.size(); i < end; ++i) {
+                if (!matrices[order_[i]])
+                    return {{0, 0}, 0};
+                
                 matrix::matrix_t<ElemT> left {0, 0};
                 matrix::matrix_t<ElemT> right{0, 0};
                 unsigned ind_left  = order_[i];
@@ -231,6 +243,13 @@ namespace matrix_chain {
                 cost += left.get_cols() * left.get_rows() * right.get_cols();
             }
             return {results.back().m, cost};
+        }
+
+        long long get_cost_mult_naive() const {
+            long long cost = 0;
+            for (int i = 1, end = matrices.size(); i < end; ++i)
+                cost += matrices[0].get_rows() * matrices[i - 1].get_cols() * matrices[i].get_cols();
+            return cost;
         }
     };
 

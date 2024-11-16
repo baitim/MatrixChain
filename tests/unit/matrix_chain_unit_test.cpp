@@ -22,7 +22,7 @@ TEST(Matrix_chain_main, test_simple_1)
     ans = chain.get_order();
     is_vectors_eq(ans, {1, 0, 2}, "test simple 1");
 
-    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive().first);
+    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive());
     ASSERT_EQ(chain.multiply_chain_fast().second, 9375);
 }
 
@@ -36,11 +36,11 @@ TEST(Matrix_chain_main, test_simple_2)
     ans = chain.get_order();
     is_vectors_eq(ans, {0, 1}, "test simple 2");
 
-    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive().first);
+    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive());
     ASSERT_EQ(chain.multiply_chain_fast().second, 4500);
 }
 
-TEST(Matrix_chain_main, test_zero)
+TEST(Matrix_chain_main, test_simple3)
 {
     std::vector<unsigned> ans;
     std::vector<unsigned> sizes = {30, 20, 10};
@@ -52,9 +52,9 @@ TEST(Matrix_chain_main, test_zero)
     chain.add_matrix(30);
 
     ans = chain.get_order();
-    is_vectors_eq(ans, {1, 0, 3, 2}, "test zero");
+    is_vectors_eq(ans, {1, 0, 3, 2}, "test simple 3");
 
-    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive().first);
+    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive());
     ASSERT_EQ(chain.multiply_chain_fast().second, 2300);
 }
 
@@ -68,6 +68,6 @@ TEST(Matrix_chain_main, test_split_muls)
     ans = chain.get_order();
     is_vectors_eq(ans, {0, 2, 1}, "test split muls");
 
-    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive().first);
+    ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive());
     ASSERT_EQ(chain.multiply_chain_fast().second, 1295);
 }
