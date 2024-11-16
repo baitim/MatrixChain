@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <set>
 
 namespace matrix_chain {
@@ -18,9 +19,9 @@ namespace matrix_chain {
         struct dp_path_t final {
             unsigned x = 0;
             unsigned y = 0;
+            unsigned oper = 0;
             dp_path_t() {}
-            dp_path_t(unsigned x_, unsigned y_) : x(x_), y(y_) {}
-            bool operator<(const dp_path_t& other) const { return y < other.y; }
+            dp_path_t(unsigned x_, unsigned y_, unsigned oper_) : x(x_), y(y_), oper(oper_) {}
         };
         using path_container_t = std::vector<std::vector<std::pair<dp_path_t, dp_path_t>>>;
         
@@ -28,33 +29,31 @@ namespace matrix_chain {
             const path_container_t& path) const {
 
             std::vector<unsigned> ans;
-            std::set<dp_path_t> opers;
+            std::stack<dp_path_t> opers;
             std::set<unsigned> used_opers;
             unsigned i, j;
             i = j = path.size() - 1;
 
-            opers.insert(path[i][j].first);
-            opers.insert(path[i][j].second);
+            opers.push(path[i][j].first);
+            opers.push(path[i][j].second);
 
             while (!opers.empty()) {
-                dp_path_t oper = *opers.begin();
+                dp_path_t oper = opers.top();
 
                 if (i > 0 &&
-                    used_opers.find(oper.y) == used_opers.end()) {
-                    std::cerr << "pushed: " << i << " " << j << "\n";
-                    ans.push_back(oper.y);
+                    j > 0 &&
+                    used_opers.find(oper.oper) == used_opers.end()) {
+                    ans.push_back(oper.oper);
+                    used_opers.insert(oper.oper);
                 }
-
 
                 i = oper.x;
                 j = oper.y;
-
-                used_opers.insert(oper.y);
-                opers.erase(oper);
+                opers.pop();
 
                 if (i > 0) {
-                    opers.insert(path[i][j].second);
-                    opers.insert(path[i][j].first);
+                    opers.push(path[i][j].first);
+                    opers.push(path[i][j].second);
                 }
             }
             reverse(ans.begin(), ans.end());
@@ -113,14 +112,14 @@ namespace matrix_chain {
                             if (dp[next_row][rcol] == -1 ||
                                 dp[next_row][rcol] > new_cost) {
 
-                                path[next_row][rcol].first  = {static_cast<unsigned>(rrow),  rcol};
-                                path[next_row][rcol].second = {lrow, lcol};
+                                path[next_row][rcol].first  = {lrow, lcol, lcol};
+                                path[next_row][rcol].second = {static_cast<unsigned>(rrow),  rcol, lcol};
                                 dp[next_row][rcol] = new_cost;
                             }
                         }
                     }
 
-#if 1
+#ifdef DEBUG
                     print_dp(dp);
                     std::cout << "\n";
                     print_path(path);
