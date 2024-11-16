@@ -34,6 +34,18 @@
     - End to end & Unit<br>
         <code>ctest --test-dir build --output-on-failure</code>
 
+## How to compare
+
+* Preparing
+    write <code>cd compare</code> in terminal <br>
+    write <code>python3 generate.py</code> in terminal <br>
+
+* Comparing
+    write <code>python3 compare.py</code> in terminal <br>
+    The result of the comparison will be in the "compare.out" and "costs.png" file
+
+<p align="center"><img src="https://github.com/baitim/MatrixChain/blob/main/compare/ratios.png" width="80%"></p>
+
 <p align="center"><img src="https://github.com/baitim/MatrixChain/blob/main/images/cat.gif" width="40%"></p>
 
 ## Support

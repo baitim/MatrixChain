@@ -23,9 +23,9 @@ int main() {
     
     try {
         matrix_chain::matrix_chain_t chain{sizes.begin(), sizes.end()};
-        chain.print_order(std::cout);
         long long cost_mult_fast  = chain.multiply_chain_fast().second;
         long long cost_mult_naive = chain.get_cost_mult_naive();
+        std::cout << cost_mult_naive << "\n";
         std::cout <<   static_cast<long double>(cost_mult_naive)
                      / static_cast<long double>(cost_mult_fast) << "\n";
 
