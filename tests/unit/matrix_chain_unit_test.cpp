@@ -71,3 +71,9 @@ TEST(Matrix_chain_main, test_split_muls)
     ASSERT_EQ(chain.multiply_chain_fast().first, chain.multiply_chain_naive());
     ASSERT_EQ(chain.multiply_chain_fast().second, 1295);
 }
+
+int main(int argc, char **argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

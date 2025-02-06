@@ -1,8 +1,10 @@
 import os
 import glob
 import subprocess
+from pathlib import Path
 
-to_curr_dir = os.path.dirname(os.path.realpath(__file__))
+curr_dir = str(Path(__file__).parent)
+proj_dir = curr_dir + "/../.."
 
 def run(answer_dir, exe_file):
     os.system("mkdir -p " + answer_dir)
@@ -14,11 +16,12 @@ def run(answer_dir, exe_file):
     ans_file.write(subprocess.check_output(command, shell=True).decode("utf-8"))
     ans_file.close()
 
-matrix_chain_exe = "./matrix_chain"
-answer_dir = to_curr_dir + "/answers"
+matrix_chain_exe = proj_dir + "/build/src/matrix_chain"
+answer_dir = proj_dir + "/tests/end_to_end/answers"
+tests_dir = proj_dir + "/tests/end_to_end/tests_in"
 
 test_num = 0
-files = list(map(str, glob.glob(to_curr_dir + "/tests_in/test_*.in")))
+files = list(map(str, glob.glob(tests_dir + "/test_*.in")))
 files.sort()
 
 for file in files :
