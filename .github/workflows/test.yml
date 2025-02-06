@@ -32,7 +32,8 @@ jobs:
         run: |
           pip install conan
           conan profile detect --force
-
+          conan remote add conan_packages ${{ secrets.CONAN_ADDRESS }}
+  
       - name: CMake release config
         run: |
           conan install . --build=missing -s compiler.cppstd=gnu20 -s build_type=Release
