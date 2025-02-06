@@ -27,7 +27,7 @@ install(TARGETS MatrixChain EXPORT MatrixChainTargets
     INCLUDES DESTINATION include
 )
 
-install(DIRECTORY ${INCLUDE_DIR} DESTINATION include)
+install(DIRECTORY ${INCLUDE_DIR}/MatrixChain DESTINATION include)
 
 install(EXPORT MatrixChainTargets
     FILE MatrixChainConfig.cmake
