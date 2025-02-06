@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.11)
 project(compare)
 
-set(INCLUDE_DIR
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Matrix/include/
-)
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/)
+
+find_package(Matrix REQUIRED)
+
 add_executable(cmp_matrix_chain matrix_chain_cmp.cpp)
-target_include_directories(cmp_matrix_chain PUBLIC ${INCLUDE_DIR})
+target_sources(cmp_matrix_chain
+    PRIVATE
+    FILE_SET HEADERS
+    BASE_DIRS ${INCLUDE_DIR}
+)
+target_link_libraries(cmp_matrix_chain Matrix::Matrix)

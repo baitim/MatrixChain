@@ -4,6 +4,10 @@
 
  Implementation of algorithm for fast multiplication of matrix chain.
 
+## How to integrate
+ 
+ use [storage](https://github.com/baitim/ConanPackages), project = "matrix_chain", version = "1.0"
+
 ## How to run
 
 1. Clone <br>
@@ -15,15 +19,16 @@
 3. Prepare conan <br>
     <code>conan profile detect --force</code>
 
-4. Init dependencies <br>
-    <code>conan install . --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True -s compiler.cppstd=gnu20</code> <br>
+4. Add conan required packages from [storage](https://github.com/baitim/ConanPackages)<br>
+    <code>conan remote add conan_packages http://188.225.84.75:9300</code>
+
+5. Init dependencies <br>
+    <code>conan install . --build=missing -s compiler.cppstd=gnu20</code><br>
     maybe you will need these flags for the conan <code>-s build_type=Debug</code>
 
-5. Init submodules <br>
-    <code>git submodule update --init --recursive</code>
-
 6. Build <br>
-    <code>cmake . -B build -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake; cmake --build build</code>
+    <code>cmake --preset release</code><br>
+    <code>cmake --build build</code>
 
 7. Run <br>
     <code>./build/src/matrix_chain</code>

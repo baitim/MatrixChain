@@ -1,4 +1,4 @@
-#include "matrix_chain.hpp"
+#include "MatrixChain/matrix_chain.hpp"
 #include <gtest/gtest.h>
 
 template <typename ElemT>

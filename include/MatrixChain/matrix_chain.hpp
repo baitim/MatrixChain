@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix.hpp"
+#include "Matrix/matrix.hpp"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -13,8 +13,8 @@ namespace matrix_chain {
         std::string msg_;
     
     public:
-        error_t(const char*        msg) : msg_(msg) {}
-        error_t(const std::string& msg) : msg_(msg) {}
+        error_t(const char*      msg) : msg_(msg) {}
+        error_t(std::string_view msg) : msg_(msg) {}
         const char* what() const noexcept { return msg_.c_str(); }
     };
 
@@ -49,7 +49,6 @@ namespace matrix_chain {
                 dp_path_t oper = opers.top();
 
                 if (i > 0 &&
-                    j > 0 &&
                     used_opers.find(oper.oper) == used_opers.end()) {
                     ans.push_back(oper.oper);
                     used_opers.insert(oper.oper);
