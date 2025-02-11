@@ -2,9 +2,10 @@ import os
 import glob
 import subprocess
 import matplotlib.pyplot as plt
+from pathlib import Path
 
-to_curr_dir = os.path.dirname(os.path.realpath(__file__))
-cmp_matrix_chain_exe = to_curr_dir + "/../build/compare/cmp_matrix_chain"
+curr_dir = str(Path.cwd())
+cmp_matrix_chain_exe = curr_dir + "/../build/Release/compare/cmp_matrix_chain"
 
 files = list(map(str, glob.glob("compare_in/test_*.in")))
 files.sort()
