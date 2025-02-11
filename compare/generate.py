@@ -1,8 +1,9 @@
 import random
 import os
+from pathlib import Path
 
-to_curr_dir = os.path.dirname(os.path.realpath(__file__))
-compare_in_dir = to_curr_dir + "/compare_in"
+compare_dir = str(Path(__file__).parent)
+compare_in_dir = compare_dir + "/compare_in"
 os.system("mkdir -p " + compare_in_dir)
 
 count_tests = 10
