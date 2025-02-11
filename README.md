@@ -31,7 +31,7 @@
     <code>cmake --build build/Release</code>
 
 7. Run <br>
-    <code>./build/src/matrix_chain</code>
+    <code>./build/Release/src/matrix_chain</code>
 
 ## How to test
 

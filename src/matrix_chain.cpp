@@ -5,7 +5,7 @@ int main() {
     int n;
     std::cin >> n;
 
-    if (!std::cin.good() || n <= 1) {
+    if (!std::cin.good() || n <= 2) {
         std::cout << print_red("Incorrect input matrix chain size\n");
         return 1;
     }

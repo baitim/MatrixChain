@@ -3,8 +3,10 @@ import glob
 import subprocess
 from pathlib import Path
 
-curr_dir = str(Path(__file__).parent)
-proj_dir = curr_dir + "/../.."
+proj_dir = str(Path(__file__).parent)
+curr_dir = str(Path.cwd())
+print(curr_dir)
+print(proj_dir)
 
 def run(answer_dir, exe_file):
     os.system("mkdir -p " + answer_dir)
@@ -16,9 +18,9 @@ def run(answer_dir, exe_file):
     ans_file.write(subprocess.check_output(command, shell=True).decode("utf-8"))
     ans_file.close()
 
-matrix_chain_exe = proj_dir + "/build/src/matrix_chain"
-answer_dir = proj_dir + "/tests/end_to_end/answers"
-tests_dir = proj_dir + "/tests/end_to_end/tests_in"
+matrix_chain_exe = curr_dir + "/../../src/matrix_chain"
+answer_dir = proj_dir + "/answers"
+tests_dir  = proj_dir + "/tests_in"
 
 test_num = 0
 files = list(map(str, glob.glob(tests_dir + "/test_*.in")))
