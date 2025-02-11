@@ -28,7 +28,7 @@
 
 6. Build <br>
     <code>cmake --preset release</code><br>
-    <code>cmake --build build</code>
+    <code>cmake --build build/Release</code>
 
 7. Run <br>
     <code>./build/src/matrix_chain</code>
@@ -37,7 +37,7 @@
 
 * Testing
     - End to end & Unit<br>
-        <code>ctest --test-dir build --output-on-failure</code>
+        <code>ctest --test-dir build/Release --output-on-failure</code>
 
 ## How to compare
 
