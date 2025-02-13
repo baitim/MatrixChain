@@ -21,12 +21,8 @@ jobs:
         run: |
           uv sync --group dev
           source .venv/bin/activate
-          {
-            echo "VIRTUAL_ENV=$VIRTUAL_ENV"
-          } >> "$GITHUB_ENV"
-          {
-            echo "$VIRTUAL_ENV/bin"
-          } >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$(pwd)/.venv" >> "$GITHUB_ENV"
+          echo "$(pwd)/.venv/bin" >> "$GITHUB_PATH"
       
       - name: install conan
         run: |
@@ -68,12 +64,8 @@ jobs:
         run: |
           uv sync --group dev
           source .venv/bin/activate
-          {
-            echo "VIRTUAL_ENV=$VIRTUAL_ENV"
-          } >> "$GITHUB_ENV"
-          {
-            echo "$VIRTUAL_ENV/bin"
-          } >> "$GITHUB_PATH"
+          echo "VIRTUAL_ENV=$(pwd)/.venv" >> "$GITHUB_ENV"
+          echo "$(pwd)/.venv/bin" >> "$GITHUB_PATH"
       
       - name: install & setup conan
         run: |
