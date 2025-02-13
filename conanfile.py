@@ -5,6 +5,7 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 class matrixChainRecipe(ConanFile):
     name = "matrix_chain"
     version = "1.0"
+    user = "baitim"
 
     license = ""
     author = ""
@@ -16,7 +17,7 @@ class matrixChainRecipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
-    requires = "matrix/1.0"
+    requires = "matrix/1.0@baitim"
     test_requires = "gtest/1.15.0"
 
     # Sources are located in the same place as this recipe, copy them to the recipe
