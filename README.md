@@ -10,8 +10,17 @@
 
 ## Requirements
 
-* Cmake >= 3.30
-* Conan >= 2.12
+* Cmake >= 3.30.8 <br>
+    ##### How to install Cmake 3.30.8 Linux/macOS:
+1. **Download** the archive with the required CMake version from the official website: [Download CMake](https://cmake.org/download/).
+2. **Unpack** the archive<br>
+    <code>sudo tar -xzvf cmake-3.30.8-linux-x86_64.tar.gz -C /opt/</code>
+3. **Set PATH**: <br>
+    <code>echo 'export PATH=/opt/cmake-3.30.8-linux-x86_64/bin:$PATH' >> ~/.bashrc</code><br>
+    <code>source ~/.bashrc</code><br>
+    or a similar one for your shell
+4. **Check** the CMake version <br>
+    <code>cmake --version</code>
 
 ## How to run
 
