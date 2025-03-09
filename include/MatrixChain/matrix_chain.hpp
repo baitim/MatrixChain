@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MatrixChain/ANSI_colors.hpp"
 #include "Matrix/matrix.hpp"
 #include <algorithm>
 #include <iostream>
@@ -9,13 +10,19 @@
 
 namespace matrix_chain {
 
-    class error_t final : std::exception {
-        std::string msg_;
-    
+    using namespace matrix;
+
+    template <typename MsgT>
+    concept error_str =
+    std::convertible_to<std::string, MsgT> &&
+    requires(std::ostream& os, MsgT msg) {
+        { os << msg } -> std::same_as<std::ostream&>;
+    };
+
+    class matrix_chain_error_t : public std::runtime_error {
     public:
-        error_t(const char*      msg) : msg_(msg) {}
-        error_t(std::string_view msg) : msg_(msg) {}
-        const char* what() const noexcept { return msg_.c_str(); }
+        template <error_str MsgT>
+        matrix_chain_error_t(MsgT msg) : std::runtime_error(msg) {}
     };
 
     class dp_chain_t {
@@ -28,8 +35,6 @@ namespace matrix_chain {
             unsigned x = 0;
             unsigned y = 0;
             unsigned oper = 0;
-            dp_path_t() {}
-            dp_path_t(unsigned x_, unsigned y_, unsigned oper_) : x(x_), y(y_), oper(oper_) {}
         };
         using path_container_t = std::vector<std::vector<std::pair<dp_path_t, dp_path_t>>>;
         
@@ -37,7 +42,7 @@ namespace matrix_chain {
             const path_container_t& path) const {
 
             std::vector<unsigned> ans;
-            std::stack<dp_path_t> opers;
+            std::stack<dp_path_t, std::vector<dp_path_t>> opers;
             std::set<unsigned> used_opers;
             unsigned i, j;
             i = j = path.size() - 1;
@@ -166,14 +171,14 @@ namespace matrix_chain {
     class matrix_chain_t final : dp_chain_t {
         using dp_chain_t::sizes_;
         using dp_chain_t::order_;
-        std::vector<matrix::matrix_t<ElemT>> matrices;
+        std::vector<matrix_t<ElemT>> matrices;
 
         struct mult_block_t final {
-            matrix::matrix_t<ElemT> m{0, 0};
+            matrix_t<ElemT> m{0, 0};
             unsigned left  = -1;
             unsigned right = -1;
             mult_block_t() {}
-            mult_block_t(matrix::matrix_t<ElemT> m_, unsigned left_, unsigned right_)
+            mult_block_t(matrix_t<ElemT> m_, unsigned left_, unsigned right_)
             : m(m_), left(left_), right(right_) {}
         };
 
@@ -184,7 +189,7 @@ namespace matrix_chain {
         template <typename It>
         matrix_chain_t(It start, It end) : dp_chain_t(start, end) {
             if (sizes_.size() < 2)
-                throw error_t{"size of chain less than 2"};
+                throw matrix_chain_error_t{str_red("size of chain less than 2")};
 
             auto it = start;
             unsigned prev = *it++;
@@ -199,26 +204,26 @@ namespace matrix_chain {
             push(size);
         }
 
-        matrix::matrix_t<ElemT> multiply_chain_naive() const {
-            matrix::matrix_t<ElemT> res = matrices[0];
+        matrix_t<ElemT> multiply_chain_naive() const {
+            matrix_t<ElemT> res = matrices[0];
             long long cost = 0;
             for (int i = 1, end = matrices.size(); i < end; ++i) {
-                matrix::matrix_t<ElemT> tmp{std::move(res)};
+                matrix_t<ElemT> tmp{std::move(res)};
                 cost += tmp.get_rows() * tmp.get_cols() * matrices[i].get_cols();
                 res = tmp * matrices[i];
             }
             return res;
         }
 
-        std::pair<matrix::matrix_t<ElemT>, long long> multiply_chain_fast() const {
+        std::pair<matrix_t<ElemT>, long long> multiply_chain_fast() const {
             std::vector<mult_block_t> results;
             long long cost = 0;
             for (int i = 0, end = order_.size(); i < end; ++i) {
                 if (!matrices[order_[i]])
                     return {{0, 0}, 0};
                 
-                matrix::matrix_t<ElemT> left  = matrices[order_[i]];
-                matrix::matrix_t<ElemT> right = matrices[order_[i] + 1];;
+                matrix_t<ElemT> left  = matrices[order_[i]];
+                matrix_t<ElemT> right = matrices[order_[i] + 1];;
                 unsigned ind_left  = order_[i];
                 unsigned ind_right = order_[i];
                 for (int j = 0, end = results.size(); j < end; ++j) {
@@ -246,7 +251,7 @@ namespace matrix_chain {
         }
     };
 
-    template <matrix::matrix_elem ElemT>
+    template <matrix_elem ElemT>
     std::ostream& operator<<(std::ostream& os, const matrix_chain_t<ElemT>& chain) {
         return chain.print_order(os);
     }
