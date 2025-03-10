@@ -1,8 +1,9 @@
+import os
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 
 
-class matrixChainRecipe(ConanFile):
+class MatrixChainRecipe(ConanFile):
     name = "matrix_chain"
     version = "1.0"
     user = "baitim"
@@ -37,6 +38,7 @@ class matrixChainRecipe(ConanFile):
         tc.generate()
 
     def build(self):
+        os.environ["CONAN_PACKAGE"] = "1"
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
