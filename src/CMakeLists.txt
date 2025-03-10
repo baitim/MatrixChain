@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 project(src)
 
-include(GNUInstallDirs)
-
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/)
 
 find_package(Matrix REQUIRED)
@@ -16,6 +14,8 @@ target_sources(matrix_chain
 target_link_libraries(matrix_chain PRIVATE Matrix::Matrix)
 
 if(DEFINED ENV{CONAN_PACKAGE})
+    include(GNUInstallDirs)
+
     add_library(MatrixChain matrix_chain.cpp)
     target_include_directories(MatrixChain PUBLIC
         $<BUILD_INTERFACE:${INCLUDE_DIR}>
