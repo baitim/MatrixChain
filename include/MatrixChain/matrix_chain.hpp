@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <stack>
-#include <set>
+#include <unordered_set>
 
 namespace matrix_chain {
 
@@ -43,7 +43,7 @@ namespace matrix_chain {
 
             std::vector<unsigned> ans;
             std::stack<dp_path_t, std::vector<dp_path_t>> opers;
-            std::set<unsigned> used_opers;
+            std::unordered_set<unsigned> used_opers;
             unsigned i, j;
             i = j = path.size() - 1;
 
@@ -68,44 +68,42 @@ namespace matrix_chain {
                     opers.push(path[i][j].second);
                 }
             }
-            reverse(ans.begin(), ans.end());
+            std::reverse(ans.begin(), ans.end());
 
             return ans;
         }
 
-        void print_dp(const std::vector<std::vector<long long>>& dp) {
+        void print_dp(const std::vector<std::vector<long long>>& dp) const {
             for (int i = 0, end = dp.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" 
+                    std::cout << '['
                               << dp[i][j] << ",\t"
                               << sizes_[std::max(0, j - i)] << ",\t"
                               << sizes_[j + 1] << "]\t";
-                std::cout << "\n";
+                std::cout << '\n';
             }
         }
 
-        void print_path(const path_container_t& path) {
+        void print_path(const path_container_t& path) const {
             for (int i = 0, end = path.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" << path[i][j].first.x << ",\t"
+                    std::cout << '[' << path[i][j].first.x << ",\t"
                                      << path[i][j].first.y << "]\t\t";
-                std::cout << "\n";
+                std::cout << '\n';
             }
             std::cout << "---------------------------------------------\n";
             for (int i = 0, end = path.size(); i < end; ++i) {
                 for (int j = 0; j < end; ++j)
-                    std::cout << "[" << path[i][j].second.x << ",\t"
+                    std::cout << '[' << path[i][j].second.x << ",\t"
                                      << path[i][j].second.y << "]\t\t";
-                std::cout << "\n";
+                std::cout << '\n';
             }
         }
 
         void update_order() {
             const unsigned dp_size = sizes_.size() - 1;
-            std::vector<std::vector<long long>> dp;
-            path_container_t path;
-            dp.assign  (dp_size, std::vector<long long>(dp_size, -1));
-            path.assign(dp_size, std::vector<std::pair<dp_path_t, dp_path_t>>(dp_size));
+            std::vector<std::vector<long long>> dp(dp_size, std::vector<long long>(dp_size, -1));
+            path_container_t path(dp_size, std::vector<std::pair<dp_path_t, dp_path_t>>(dp_size));
 
             for (unsigned i = 0; i < dp_size; ++i)
                 dp[0][i] = 0;
@@ -133,10 +131,10 @@ namespace matrix_chain {
 
 #ifdef DEBUG
                     print_dp(dp);
-                    std::cout << "\n";
+                    std::cout << '\n';
                     print_path(path);
-                    std::cout << "\n";
-                    std::cout << "\n";
+                    std::cout << '\n';
+                    std::cout << '\n';
 #endif
                 }
             }
@@ -157,8 +155,8 @@ namespace matrix_chain {
 
         std::ostream& print_order(std::ostream& os) const {
             for (auto i : order_)
-                os << i << " ";
-            os << "\n";
+                os << i << ' ';
+            os << '\n';
             return os;
         }
 
@@ -167,7 +165,7 @@ namespace matrix_chain {
         virtual ~dp_chain_t() {};
     };
 
-    template <matrix::matrix_elem ElemT = unsigned long long>
+    template <matrix_elem_t ElemT = unsigned long long>
     class matrix_chain_t final : dp_chain_t {
         using dp_chain_t::sizes_;
         using dp_chain_t::order_;
@@ -177,16 +175,16 @@ namespace matrix_chain {
             matrix_t<ElemT> m{0, 0};
             unsigned left  = -1;
             unsigned right = -1;
-            mult_block_t() {}
-            mult_block_t(matrix_t<ElemT> m_, unsigned left_, unsigned right_)
-            : m(m_), left(left_), right(right_) {}
         };
 
     public:
         using dp_chain_t::print_order;
         using dp_chain_t::get_order;
 
-        template <typename It>
+        template <std::input_iterator It>
+        requires matrix_elem_t<typename std::iterator_traits<It>::value_type> &&
+                 std::convertible_to<typename std::iterator_traits<It>::value_type, unsigned> &&
+                 std::default_initializable<ElemT>
         matrix_chain_t(It start, It end) : dp_chain_t(start, end) {
             if (sizes_.size() < 2)
                 throw matrix_chain_error_t{str_red("size of chain less than 2")};
@@ -194,7 +192,7 @@ namespace matrix_chain {
             auto it = start;
             unsigned prev = *it++;
             for (; it != end; ++it) {
-                matrices.push_back({prev, *it, 1});
+                matrices.push_back({prev, *it, ElemT{}});
                 prev = *it;
             }
         }
@@ -251,7 +249,7 @@ namespace matrix_chain {
         }
     };
 
-    template <matrix_elem ElemT>
+    template <matrix_elem_t ElemT>
     std::ostream& operator<<(std::ostream& os, const matrix_chain_t<ElemT>& chain) {
         return chain.print_order(os);
     }

@@ -26,10 +26,10 @@ int main() try {
     long long cost_mult_fast  = chain.multiply_chain_fast().second;
     long long cost_mult_naive = chain.get_cost_mult_naive();
     std::cout <<   static_cast<long double>(cost_mult_naive)
-                 / static_cast<long double>(cost_mult_fast) << "\n";
+                 / static_cast<long double>(cost_mult_fast) << '\n';
 
 } catch(const matrix_chain_error_t& error) {
-    std::cout << error.what() << "\n";
+    std::cout << error.what() << '\n';
     return 1;
 } catch (...) {
     std::cout << print_red("Unknown error\n");

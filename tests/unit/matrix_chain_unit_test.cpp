@@ -3,7 +3,7 @@
 
 template <typename ElemT>
 void is_vectors_eq(const std::vector<ElemT>& v1, const std::vector<ElemT>& v2,
-                   const std::string& msg = "") {
+                   std::string_view msg = "") {
     ASSERT_EQ(v1.size(), v2.size());
     for (int i = 0, end = v1.size(); i < end; ++i)
         EXPECT_EQ(v1[i], v2[i]) << " at index: " << i << " " << msg << "\n";
