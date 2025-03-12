@@ -8,16 +8,16 @@ int main() try {
     std::cin >> n;
 
     if (!std::cin.good() || n <= 2)
-        throw matrix_chain_error_t{str_red("Incorrect input matrix chain size\n")};
+        throw matrix_chain::error_t{str_red("Incorrect input matrix chain size\n")};
 
     std::vector<unsigned> sizes(n);
     for (size_t i = 0; i < n; ++i) {
         unsigned size;
         std::cin >> size;
         if (!std::cin.good())
-            throw matrix_chain_error_t{str_red(  "Incorrect input "
-                                               + std::to_string(i + 1)
-                                               + " matrix size(negtive)\n")};
+            throw matrix_chain::error_t{str_red(  "Incorrect input "
+                                                + std::to_string(i + 1)
+                                                + " matrix size(negtive)\n")};
         sizes[i] = size;
     }
 
@@ -28,7 +28,7 @@ int main() try {
     std::cout <<   static_cast<long double>(cost_mult_naive)
                  / static_cast<long double>(cost_mult_fast) << '\n';
 
-} catch(const matrix_chain_error_t& error) {
+} catch(const matrix_chain::error_t& error) {
     std::cout << error.what() << '\n';
     return 1;
 } catch (...) {

@@ -12,9 +12,9 @@ namespace matrix_chain {
 
     using namespace matrix;
 
-    class matrix_chain_error_t : public std::runtime_error {
+    class error_t : public std::runtime_error {
     public:
-        matrix_chain_error_t(std::string msg) : std::runtime_error(msg) {}
+    error_t(std::string msg) : std::runtime_error(msg) {}
     };
 
     class dp_chain_t {
@@ -179,7 +179,7 @@ namespace matrix_chain {
                  std::default_initializable<ElemT>
         matrix_chain_t(It start, It end) : dp_chain_t(start, end) {
             if (sizes_.size() < 2)
-                throw matrix_chain_error_t{str_red("size of chain less than 2")};
+                throw error_t{str_red("size of chain less than 2")};
 
             auto it = start;
             unsigned prev = *it++;
