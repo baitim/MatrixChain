@@ -14,7 +14,7 @@ namespace matrix_chain {
 
     class error_t : public std::runtime_error {
     public:
-    error_t(std::string msg) : std::runtime_error(msg) {}
+        error_t(std::string msg) : std::runtime_error(msg) {}
     };
 
     class dp_chain_t {
