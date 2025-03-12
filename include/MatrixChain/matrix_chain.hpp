@@ -12,17 +12,9 @@ namespace matrix_chain {
 
     using namespace matrix;
 
-    template <typename MsgT>
-    concept error_str =
-    std::convertible_to<std::string, MsgT> &&
-    requires(std::ostream& os, MsgT msg) {
-        { os << msg } -> std::same_as<std::ostream&>;
-    };
-
     class matrix_chain_error_t : public std::runtime_error {
     public:
-        template <error_str MsgT>
-        matrix_chain_error_t(MsgT msg) : std::runtime_error(msg) {}
+        matrix_chain_error_t(std::string msg) : std::runtime_error(msg) {}
     };
 
     class dp_chain_t {
