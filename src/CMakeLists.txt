@@ -13,27 +13,25 @@ target_sources(matrix_chain
 )
 target_link_libraries(matrix_chain PRIVATE Matrix::Matrix)
 
-if(DEFINED ENV{CONAN_PACKAGE})
-    include(GNUInstallDirs)
+include(GNUInstallDirs)
 
-    add_library(MatrixChain matrix_chain.cpp)
-    target_include_directories(MatrixChain PUBLIC
-        $<BUILD_INTERFACE:${INCLUDE_DIR}>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
-    target_link_libraries(MatrixChain PRIVATE Matrix::Matrix)
+add_library(MatrixChain matrix_chain.cpp)
+target_include_directories(MatrixChain PUBLIC
+    $<BUILD_INTERFACE:${INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_link_libraries(MatrixChain PRIVATE Matrix::Matrix)
 
-    install(TARGETS MatrixChain EXPORT MatrixChainTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    )
+install(TARGETS MatrixChain EXPORT MatrixChainTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
-    install(DIRECTORY ${INCLUDE_DIR}/MatrixChain DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY ${INCLUDE_DIR}/MatrixChain DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-    install(EXPORT MatrixChainTargets
-        FILE MatrixChainConfig.cmake
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/cmake/MatrixChain
-    )
-endif()
+install(EXPORT MatrixChainTargets
+    FILE MatrixChainConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/cmake/MatrixChain
+)

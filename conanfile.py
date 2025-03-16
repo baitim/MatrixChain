@@ -38,7 +38,6 @@ class MatrixChainRecipe(ConanFile):
         tc.generate()
 
     def build(self):
-        os.environ["CONAN_PACKAGE"] = "1"
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
