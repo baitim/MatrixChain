@@ -29,9 +29,9 @@ int main() try {
                  / static_cast<long double>(cost_mult_fast) << '\n';
 
 } catch(const matrix_chain::error_t& error) {
-    std::cout << error.what() << '\n';
+    std::cerr << error.what() << '\n';
     return 1;
 } catch (...) {
-    std::cout << print_red("Unknown error\n");
+    std::cerr << print_red("Unknown error\n");
     return 1;
 }
