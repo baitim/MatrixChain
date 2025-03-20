@@ -38,7 +38,7 @@
     <code>conan remote add conan_packages http://188.225.84.75:9300</code>
 
 5. Init dependencies <br>
-    <code>conan install . --build=missing -s compiler.cppstd=gnu20</code><br>
+    <code>conan install . --build=missing</code><br>
     maybe you will need these flags for the conan <code>-s build_type=Debug</code>
 
 6. Build <br>
