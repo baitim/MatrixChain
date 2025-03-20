@@ -16,139 +16,141 @@ namespace matrix_chain {
     public:
         error_t(std::string msg) : std::runtime_error(msg) {}
     };
+}
 
-    namespace detail {
-        class dp_chain_t {
-        protected:
-            std::vector<unsigned> sizes_;
-            std::vector<unsigned> order_;
+namespace matrix_chain::detail {
+    class dp_chain_t {
+    protected:
+        std::vector<unsigned> sizes_;
+        std::vector<unsigned> order_;
 
-        private:
-            struct dp_path_t final {
-                unsigned x = 0;
-                unsigned y = 0;
-                unsigned oper = 0;
-            };
-            using path_container_t = std::vector<std::vector<std::pair<dp_path_t, dp_path_t>>>;
-            
-            std::vector<unsigned> get_optimal_path(
-                const path_container_t& path) const {
+    private:
+        struct dp_path_t final {
+            unsigned x = 0;
+            unsigned y = 0;
+            unsigned oper = 0;
+        };
+        using path_container_t = std::vector<std::vector<std::pair<dp_path_t, dp_path_t>>>;
+        
+        std::vector<unsigned> get_optimal_path(
+            const path_container_t& path) const {
 
-                std::vector<unsigned> ans;
-                std::stack<dp_path_t, std::vector<dp_path_t>> opers;
-                std::unordered_set<unsigned> used_opers;
-                unsigned i, j;
-                i = j = path.size() - 1;
+            std::vector<unsigned> ans;
+            std::stack<dp_path_t, std::vector<dp_path_t>> opers;
+            std::unordered_set<unsigned> used_opers;
+            unsigned i, j;
+            i = j = path.size() - 1;
 
-                opers.push(path[i][j].first);
-                opers.push(path[i][j].second);
+            opers.push(path[i][j].first);
+            opers.push(path[i][j].second);
 
-                while (!opers.empty()) {
-                    dp_path_t oper = opers.top();
+            while (!opers.empty()) {
+                dp_path_t oper = opers.top();
 
-                    if (i > 0 &&
-                        used_opers.find(oper.oper) == used_opers.end()) {
-                        ans.push_back(oper.oper);
-                        used_opers.insert(oper.oper);
-                    }
-
-                    i = oper.x;
-                    j = oper.y;
-                    opers.pop();
-
-                    if (i > 0) {
-                        opers.push(path[i][j].first);
-                        opers.push(path[i][j].second);
-                    }
+                if (i > 0 &&
+                    used_opers.find(oper.oper) == used_opers.end()) {
+                    ans.push_back(oper.oper);
+                    used_opers.insert(oper.oper);
                 }
-                std::reverse(ans.begin(), ans.end());
 
-                return ans;
-            }
+                i = oper.x;
+                j = oper.y;
+                opers.pop();
 
-            void print_dp(const std::vector<std::vector<long long>>& dp) const {
-                for (int i = 0, end = dp.size(); i < end; ++i) {
-                    for (int j = 0; j < end; ++j)
-                        std::cout << '['
-                                << dp[i][j] << ",\t"
-                                << sizes_[std::max(0, j - i)] << ",\t"
-                                << sizes_[j + 1] << "]\t";
-                    std::cout << '\n';
+                if (i > 0) {
+                    opers.push(path[i][j].first);
+                    opers.push(path[i][j].second);
                 }
             }
+            std::reverse(ans.begin(), ans.end());
 
-            void print_path(const path_container_t& path) const {
-                for (int i = 0, end = path.size(); i < end; ++i) {
-                    for (int j = 0; j < end; ++j)
-                        std::cout << '[' << path[i][j].first.x << ",\t"
-                                        << path[i][j].first.y << "]\t\t";
-                    std::cout << '\n';
-                }
-                std::cout << "---------------------------------------------\n";
-                for (int i = 0, end = path.size(); i < end; ++i) {
-                    for (int j = 0; j < end; ++j)
-                        std::cout << '[' << path[i][j].second.x << ",\t"
-                                        << path[i][j].second.y << "]\t\t";
-                    std::cout << '\n';
-                }
+            return ans;
+        }
+
+        void print_dp(const std::vector<std::vector<long long>>& dp) const {
+            for (int i = 0, end = dp.size(); i < end; ++i) {
+                for (int j = 0; j < end; ++j)
+                    std::cout << '['
+                            << dp[i][j] << ",\t"
+                            << sizes_[std::max(0, j - i)] << ",\t"
+                            << sizes_[j + 1] << "]\t";
+                std::cout << '\n';
             }
+        }
 
-            void update_order() {
-                const unsigned dp_size = sizes_.size() - 1;
-                std::vector<std::vector<long long>> dp(dp_size, std::vector<long long>(dp_size, -1));
-                path_container_t path(dp_size, std::vector<std::pair<dp_path_t, dp_path_t>>(dp_size));
+        void print_path(const path_container_t& path) const {
+            for (int i = 0, end = path.size(); i < end; ++i) {
+                for (int j = 0; j < end; ++j)
+                    std::cout << '[' << path[i][j].first.x << ",\t"
+                                    << path[i][j].first.y << "]\t\t";
+                std::cout << '\n';
+            }
+            std::cout << "---------------------------------------------\n";
+            for (int i = 0, end = path.size(); i < end; ++i) {
+                for (int j = 0; j < end; ++j)
+                    std::cout << '[' << path[i][j].second.x << ",\t"
+                                    << path[i][j].second.y << "]\t\t";
+                std::cout << '\n';
+            }
+        }
 
-                for (unsigned i = 0; i < dp_size; ++i)
-                    dp[0][i] = 0;
+        void update_order() {
+            const unsigned dp_size = sizes_.size() - 1;
+            std::vector<std::vector<long long>> dp(dp_size, std::vector<long long>(dp_size, -1));
+            path_container_t path(dp_size, std::vector<std::pair<dp_path_t, dp_path_t>>(dp_size));
 
-                for (unsigned i = 0; i < dp_size - 1; ++i) {
-                    for (unsigned j = i + 1; j < dp_size; ++j) {
-                        unsigned next_row = i + 1;
-                        for (int rrow = i; rrow >= 0; --rrow) {
-                            unsigned rcol = j;
-                            unsigned lrow = i - rrow;
-                            unsigned lcol = j - rrow - 1;
-                            if ((static_cast<int>(j) - rrow - 1) >= 0) {
-                                unsigned x = sizes_[j - i - 1] * sizes_[lcol + 1] * sizes_[rcol + 1];
-                                unsigned new_cost = x + dp[lrow][lcol] + dp[rrow][rcol];
+            for (unsigned i = 0; i < dp_size; ++i)
+                dp[0][i] = 0;
 
-                                if (dp[next_row][rcol] == -1 ||
-                                    dp[next_row][rcol] > new_cost) {
+            for (unsigned i = 0; i < dp_size - 1; ++i) {
+                for (unsigned j = i + 1; j < dp_size; ++j) {
+                    unsigned next_row = i + 1;
+                    for (int rrow = i; rrow >= 0; --rrow) {
+                        unsigned rcol = j;
+                        unsigned lrow = i - rrow;
+                        unsigned lcol = j - rrow - 1;
+                        if ((static_cast<int>(j) - rrow - 1) >= 0) {
+                            unsigned x = sizes_[j - i - 1] * sizes_[lcol + 1] * sizes_[rcol + 1];
+                            unsigned new_cost = x + dp[lrow][lcol] + dp[rrow][rcol];
 
-                                    path[next_row][rcol].first  = {lrow, lcol, lcol};
-                                    path[next_row][rcol].second = {static_cast<unsigned>(rrow),  rcol, lcol};
-                                    dp[next_row][rcol] = new_cost;
-                                }
+                            if (dp[next_row][rcol] == -1 ||
+                                dp[next_row][rcol] > new_cost) {
+
+                                path[next_row][rcol].first  = {lrow, lcol, lcol};
+                                path[next_row][rcol].second = {static_cast<unsigned>(rrow),  rcol, lcol};
+                                dp[next_row][rcol] = new_cost;
                             }
                         }
                     }
                 }
-
-                order_ = get_optimal_path(path);
             }
 
-        public:
-            template <typename It>
-            dp_chain_t(It start, It end) : sizes_(start, end) {
-                update_order();
-            }
+            order_ = get_optimal_path(path);
+        }
 
-            void push(unsigned size) {
-                sizes_.push_back(size);
-                update_order();
-            }
+    public:
+        template <typename It>
+        dp_chain_t(It start, It end) : sizes_(start, end) {
+            update_order();
+        }
 
-            std::ostream& print_order(std::ostream& os) const {
-                for (auto i : order_)
-                    os << i << ' ';
-                os << '\n';
-                return os;
-            }
+        void push(unsigned size) {
+            sizes_.push_back(size);
+            update_order();
+        }
 
-            std::vector<unsigned> get_order() const { return order_; }
-        };
-    }
+        std::ostream& print_order(std::ostream& os) const {
+            for (auto i : order_)
+                os << i << ' ';
+            os << '\n';
+            return os;
+        }
 
+        std::vector<unsigned> get_order() const { return order_; }
+    };
+}
+
+namespace matrix_chain {
     template <matrix_elem_t ElemT = unsigned long long>
     class matrix_chain_t final : private detail::dp_chain_t {
         using dp_chain_t::sizes_;
